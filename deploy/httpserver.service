@@ -1,0 +1,17 @@
+[Unit]
+Description=Networking Lab HTTP Server
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/opt/httpserver
+Environment=PORT=8080
+ExecStart=/usr/bin/java -jar /opt/httpserver/httpserver.jar
+Restart=on-failure
+RestartSec=5
+# stdout/stderr go to the systemd journal by default:
+#   journalctl -u httpserver -f
+
+[Install]
+WantedBy=multi-user.target

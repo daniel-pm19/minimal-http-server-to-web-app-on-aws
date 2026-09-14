@@ -1,0 +1,189 @@
+Local evidence capture - 2026-09-14T12:27:13Z
+Command: PORT=8123 java -jar target/httpserver.jar
+========================================================
+
+### 1. Home page (GET /) ###
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=UTF-8
+Content-Length: 5061
+Connection: close
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Networking Lab - Mini Web App</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #1b1f3b;
+            --muted: #5b6178;
+            --border: #dde1ec;
+            --accent: #2e5bff;
+            --ok-bg: #e8f8f0;
+            --ok-border: #1e9e6b;
+            --err-bg: #fdeceb;
+            --err-border: #d33;
+ 
+... (truncated)
+
+### 2. Static JS (GET /app.js) ###
+HTTP/1.1 200 OK
+Content-Type: text/javascript; charset=UTF-8
+Content-Length: 3948
+Connection: close
+
+"use strict";
+
+const resultEl = document.getElementById("result");
+... (truncated)
+
+### 3. PNG image (GET /logo.png) - headers only, binary body omitted ###
+HTTP/1.1 200 OK
+Content-Type: image/png
+Content-Length: 4701
+Connection: close
+
+
+### 4. JPEG image (GET /photo.jpg) - headers only, binary body omitted ###
+HTTP/1.1 200 OK
+Content-Type: image/jpeg
+Content-Length: 11155
+Connection: close
+
+
+### 5. Valid greeting (GET /greeting?name=Daniel) ###
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 28
+Connection: close
+
+{"message":"Hello, Daniel!"}
+
+### 6. Invalid greeting - missing name (GET /greeting) ###
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=UTF-8
+Content-Length: 50
+Connection: close
+
+{"error":"Missing required query parameter: name"}
+
+### 7. JSON-escaping check (GET /greeting?name=<script>"evil"</script>) ###
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 47
+Connection: close
+
+{"message":"Hello, <script>\"evil\"</script>!"}
+
+### 8. Valid square (GET /square?number=7) ###
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 23
+Connection: close
+
+{"input":7,"square":49}
+
+### 9. Invalid square - not a number (GET /square?number=abc) ###
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=UTF-8
+Content-Length: 39
+Connection: close
+
+{"error":"'abc' is not a valid number"}
+
+### 10. Server time (GET /time) ###
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 47
+Connection: close
+
+{"serverTime":"2026-09-14T12:27:14.115810403Z"}
+
+### 11. Health (GET /health) ###
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Content-Length: 15
+Connection: close
+
+{"status":"UP"}
+
+### 12. Missing static file (GET /does-not-exist.html) ###
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 13
+Connection: close
+
+404 Not Found
+
+### 13. Unsupported method (POST /) ###
+HTTP/1.1 405 Method Not Allowed
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 22
+Connection: close
+Allow: GET
+
+405 Method Not Allowed
+
+### 14. Path traversal attempt, literal (GET /../../pom.xml, --path-as-is) ###
+HTTP/1.1 400 Bad Request
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 28
+Connection: close
+
+400 Bad Request: unsafe path
+
+### 15. Path traversal attempt, percent-encoded (GET /%2e%2e%2fpom.xml, --path-as-is) ###
+HTTP/1.1 400 Bad Request
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 28
+Connection: close
+
+400 Bad Request: unsafe path
+
+### 16. Ten consecutive requests on the same server run (no restart) ###
+  request 1 -> HTTP 200
+  request 2 -> HTTP 200
+  request 3 -> HTTP 200
+  request 4 -> HTTP 200
+  request 5 -> HTTP 200
+  request 6 -> HTTP 200
+  request 7 -> HTTP 200
+  request 8 -> HTTP 200
+  request 9 -> HTTP 200
+  request 10 -> HTTP 200
+
+### 17. Sequential-blocking demo: /slow (5s) then /health, timed ###
+  /health status: 200
+  /slow fired at t=0ms; /health fired at t=304ms and returned at t=5016ms
+  /health had to wait 4712ms behind /slow before it got a connection accepted
+  total wall time for both requests: 5019ms (proves the server handled them one at a time, not concurrently)
+
+========================================================
+Addendum - edge cases found and fixed during grading review - 2026-09-14T15:15:50Z
+========================================================
+
+### 18. /square with NaN / Infinity / overflow - must reject, never emit invalid JSON ###
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=UTF-8
+Content-Length: 40
+Connection: close
+
+{"error":"'NaN' is not a finite number"}
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=UTF-8
+Content-Length: 45
+Connection: close
+
+{"error":"'Infinity' is not a finite number"}
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=UTF-8
+Content-Length: 59
+Connection: close
+
+{"error":"The square of '1e300' is too large to represent"}
+
+### 19. Idle connection (no data sent) must not block the server forever ###
+  Opening a raw socket and sending nothing for 12s (production read timeout is 10s)...
+  /health status: 200, returned after 9031ms despite the still-open idle connection
