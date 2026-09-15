@@ -1,0 +1,33 @@
+# Maven build output
+target/
+*.class
+*.jar
+!deploy/**/*.jar
+
+# IDE metadata
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.settings/
+.classpath
+.project
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment / secrets / cloud config
+.env
+.env.*
+*.pem
+*.ppk
+*.key
+.aws/
+aws-exports.js
+credentials*.json

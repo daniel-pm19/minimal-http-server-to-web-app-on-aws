@@ -1,8 +1,0 @@
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/ContentTypesTest.java
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/HttpServerIntegrationTest.java
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/JsonTest.java
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/PathSanitizerTest.java
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/services/GreetingServiceTest.java
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/services/HealthServiceTest.java
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/services/SquareServiceTest.java
-/home/daniel/Documents/University/Eighth_Semester/TDSE/week-6/minimal-http-server-to-web-app-on-aws/src/test/java/com/escuelaing/httpserver/services/TimeServiceTest.java
