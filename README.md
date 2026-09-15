@@ -172,7 +172,7 @@ docs/evidence/                             Local test evidence (see section 11)
 git clone <this-repository-url>
 cd minimal-http-server-to-web-app-on-aws
 
-mvn test      # compiles everything and runs the 48 unit + integration tests
+mvn test      # compiles everything and runs the 53 unit + integration tests
 mvn package   # produces target/httpserver.jar (runnable, resources included)
 ```
 
